@@ -37,7 +37,11 @@ public class UserCase {
 		//读取Excel文件中的参数
 		User.login(driver, username, password);		
 		
-	}		
+	}
+	
+	
+	
+	
 	
 	@AfterTest
 	public void close() {
