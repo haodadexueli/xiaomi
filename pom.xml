@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>XiMi</groupId>
+	<artifactId>Xi_Mi</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<!-- maven项目名称及地址 -->
+	<name>Xi_Mi</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<!-- 项目编码设置为utf-8,运行测试时，读取testng.xml中的test -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<xmlFilename>testng.xml</xmlFilename>
+	</properties>
+
+	<dependencies>
+		<!-- testng 在maven仓库的坐标 -->
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>6.10</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+
+		<!-- reportng 在maven仓库的坐标,maven的一个插件，替换testng原有的html报告 -->
+		<dependency>
+			<groupId>org.uncommons</groupId>
+			<artifactId>reportng</artifactId>
+			<version>1.1.4</version>
+			<!-- <scope>test</scope> -->
+		</dependency>
+
+		<!-- javax.mail 在maven仓库的坐标,用来把测试报告以邮件的方式发送 -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<!-- selenium 在maven仓库的坐标 -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.141.59</version>
+		</dependency>
+
+		<!-- 轻量级的依赖注入框架 -->
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+
+		<!-- POI读取文件的插件，下面两个读取文件的插件版本要一致 -->		
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.16</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.16</version>
+		</dependency>
+
+
+
+	</dependencies>
+
+	<build>
+		<!-- 插件管理，定义插件 -->
+		<pluginManagement>
+			<plugins>
+				<!-- 针对maven代码编译时需要运用的插件（ compiler 编译 ） -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.7.0</version>
+				</plugin>
+				<!-- 针对maven代码执行时需要运用的插件 （surefire 执行 ） surefire plugin 默认只能识别以Test开头或者Test,TestCase结尾的java文件 -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>2.17</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<!-- 以下是配置执行插件动作 -->
+		<plugins>
+			<plugin>
+				<!-- 插件编译时的配置 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<!-- 当前JDK的版本，target的版本 ，字符编码 -->
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- 插件调用执行testng时的自定义配置 -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- 执行testng失败了继续处理，重试的次数为不重试执行 -->
+					<testFailureIgnore>true</testFailureIgnore>
+					<forkMode>once</forkMode>
+					<!-- 定义测试主件的名称，调用testng.xml的信息，执行测试用例 -->
+					<suiteXmlFiles>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+					<properties>
+						<!-- 关闭testng的默认监听 -->
+						<property>
+							<name>usedefaultlisteners</name>
+							<value>false</value>
+						</property>
+						<!-- 添加reportng自带的监听，收集测试结果，产出reportng的测试报告 -->
+						<property>
+							<name>listener</name>
+							<value>
+								<!-- JUnitXMLReporter 用于给jenkins使用的 -->
+								org.uncommons.reportng.HTMLReporter,org.uncommons.reportng.JUnitXMLReporter
+							</value>
+						</property>						
+						<!-- 设置资源的字符编码 -->
+						<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>						    
+					</properties>
+					<!-- 生成测试报告的路劲 -->
+					<workingDirectory>target/</workingDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<!-- 获取工程的classpath,简化应用程序的启动 命令的插件，不用每次都解压后再压缩java文件 使用exec比使用java命令去启动应用程序最大的优势就在于：你不需要再去为-classpath而伤脑筋了 -->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<!-- 是在什么情况下执行， 测试(test)的情况下, 执行MavenTest后会执行该类 -->
+						<phase>test</phase>
+						<!-- 定义目标类的类型为java类型 -->
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<!-- 执行Automail里的方法必须要用到dependencies里的方法 -->
+							<includePluginDependencies>true</includePluginDependencies>
+							<!-- 执行mail核心类 -->
+							<mainClass>mail.AutoMail</mainClass>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

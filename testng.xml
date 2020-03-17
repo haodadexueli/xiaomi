@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="小米自动化测试" parallel="tests" thread-count="1">
+  <test name="Test1" >
+    <classes>
+      <class name="cases.UserCase"/>
+      <parameter name="browser" value="firefox"></parameter>
+      <parameter name="url" value="http://127.0.0.1:81/xiaomi/"></parameter>
+    </classes>
+  </test> <!-- Test -->  
+</suite> <!-- 自动化测试 -->
